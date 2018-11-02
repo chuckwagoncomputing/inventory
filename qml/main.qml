@@ -44,6 +44,20 @@ ApplicationWindow {
    window.itemsLoaded = count
   }
 
+  onErrorSearching: {
+   window.searchLabelMessage = "Error Searchings: " + errmsg
+   window.searchLoaderSource = searchLabel
+  }
+  onSearchCompleted: {
+   if (count === 0) {
+    window.searchLabelMessage = "No Items Found"
+    window.searchLoaderSource = searchLabel
+   }
+   else {
+    window.searchLoaderSource = Qt.createComponent("qrc:///qml/searchList.qml")
+   }
+  }
+
   onError: {
    errorToolTip.text = errmsg
    errorToolTip.visible = true
@@ -52,6 +66,9 @@ ApplicationWindow {
 
  property var itemLoaderSource: itemLabel
  property string itemLabelMessage: "Loading Items..."
+ property var searchLoaderSource: searchLabel
+ property string searchLabelMessage: "Enter a search term, then press the search button"
+
 
  Component {
   id: itemLabel
@@ -60,6 +77,23 @@ ApplicationWindow {
    anchors.verticalCenter: parent.verticalCenter
    Label {
     text: window.itemLabelMessage
+    width: parent.width
+    horizontalAlignment: Text.AlignHCenter
+    wrapMode: Text.Wrap
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    font.pixelSize: 24
+   }
+  }
+ }
+
+ Component {
+  id: searchLabel
+  Rectangle {
+   anchors.horizontalCenter: parent.horizontalCenter
+   anchors.verticalCenter: parent.verticalCenter
+   Label {
+    text: window.searchLabelMessage
     width: parent.width
     horizontalAlignment: Text.AlignHCenter
     wrapMode: Text.Wrap
@@ -82,6 +116,18 @@ ApplicationWindow {
    horizontalAlignment: Qt.AlignHCenter
    verticalAlignment: Qt.AlignVCenter
    Layout.fillWidth: true
+   visible: !stack.currentItem.searchFieldEnabled
+  }
+
+  TextField {
+   anchors.verticalCenter: parent.verticalCenter
+   id: searchField
+   anchors.left: backButton.right
+   anchors.right: searchButton.left
+   placeholderText: "Search"
+   visible: stack.currentItem.searchFieldEnabled || false
+   color: "black"
+   background: Rectangle { color: "white" }
   }
 
   ToolButton {
@@ -103,9 +149,27 @@ ApplicationWindow {
   }
 
   ToolButton {
+   id: searchButton
+   visible: stack.currentItem.searchEnabled || false
+   anchors.right: parent.right
+   anchors.verticalCenter: parent.verticalCenter
+   width: parent.height
+   height: parent.height
+   contentItem: Image {
+    fillMode: Image.PreserveAspectFit
+    horizontalAlignment: Image.AlignHCenter
+    verticalAlignment: Image.AlignVCenter
+    source: "images/search.png"
+   }
+   onClicked: {
+    stack.currentItem.search()
+   }
+  }
+
+  ToolButton {
    id: addButton
    visible: stack.currentItem.addEnabled || false
-   anchors.right: parent.right
+   anchors.right: searchButton.left
    anchors.verticalCenter: parent.verticalCenter
    width: parent.height
    height: parent.height

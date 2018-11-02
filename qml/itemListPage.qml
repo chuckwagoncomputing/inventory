@@ -11,6 +11,7 @@ Rectangle {
  property int indicatorIndex: 0
  property bool backDisabled: true
  property bool addEnabled: true
+ property bool searchEnabled: true
  property bool settingsEnabled: true
  property bool refreshEnabled: true
  signal add()
@@ -18,6 +19,10 @@ Rectangle {
   // Reset the current job to empty values
   workingItem.reset()
   stack.push("qrc:///qml/descriptionEntryPage.qml")
+ }
+ signal search()
+ onSearch: {
+  stack.push("qrc:///qml/searchPage.qml")
  }
  Loader {
   id: itemLoader

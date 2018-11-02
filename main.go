@@ -20,10 +20,13 @@ type QmlBridge struct {
  _ func(d string, l string, q string) `slot:"newItem"`
  _ func(i int, d string, l string, q string) `slot:"editItem"`
  _ func(i int) `slot:"removeItem"`
+ _ func(s string) `slot:"search"`
+ _ func(count int) `signal:"searchCompleted"`
 }
 
 var qmlBridge *QmlBridge
 var itemModel *ItemModel
+var searchModel *SearchModel
 
 // dbMutex is for controlling DB access.
 var dbMutex sync.Mutex
@@ -31,6 +34,7 @@ var dbMutex sync.Mutex
 func main() {
  qmlBridge = NewQmlBridge(nil)
  itemModel = NewItemModel(nil)
+ searchModel = NewSearchModel(nil)
 
  core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
  gui.NewQGuiApplication(len(os.Args), os.Args)
@@ -41,9 +45,11 @@ func main() {
  qmlBridge.ConnectNewItem(itemModel.newItemShim)
  qmlBridge.ConnectEditItem(itemModel.editItemShim)
  qmlBridge.ConnectRemoveItem(itemModel.removeItemShim)
+ qmlBridge.ConnectSearch(searchModel.searchShim)
 
  view.RootContext().SetContextProperty("QmlBridge", qmlBridge)
  view.RootContext().SetContextProperty("ItemModel", itemModel)
+ view.RootContext().SetContextProperty("SearchModel", searchModel)
 
  view.Load(core.NewQUrl3("qrc:///qml/main.qml", 0))
  gui.QGuiApplication_Exec()

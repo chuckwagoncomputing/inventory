@@ -26,6 +26,7 @@ Rectangle {
     text: workingItem.description
     font.pixelSize: 24
     anchors.margins: 10
+    wrapMode: Text.Wrap
    }
    Label {
     id: locLabel
